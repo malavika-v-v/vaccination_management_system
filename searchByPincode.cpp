@@ -26,7 +26,7 @@ struct date
        while( dateFlag == 0 )
        {
           
-       cout<< "\nEnter date of vaccination:-\n ";       //or use getline for string and then parse with .find and .substr and .erase?
+       //or use getline for string and then parse with .find and .substr and .erase?
        cout<< "Enter day in dd format: ";
        cin>> day;
        cout<< "Enter month in mm format: ";
@@ -63,7 +63,7 @@ struct date
    int getDatesDifference( date date2 )
    {
  
-       //fn finds difference in days by: finding no of days from year 0000 for each date and subtracting them;
+       //fn finds difference in days date2 - date1(aka calling date) by: finding no of days from year 0000 for each date and subtracting them;
  
        int daysBeforeDate1=0;
        int daysBeforeDate2=0;
@@ -129,7 +129,7 @@ struct date
  
  
        //check 60 difference btw days
-       return abs(daysBeforeDate2 - daysBeforeDate1) ;
+       return (daysBeforeDate2 - daysBeforeDate1) ;
  
    }
  
@@ -168,13 +168,14 @@ void showVaccineDetails()
 }
 
 
-int checkPincodeExist(int inputPin)//rewrite since pincode search not used in this manner  
+//fn to search for pincode and if exists check if respective vaccine dose >0 and then decrement and store back to file, returning 1 if success
+int checkPincodeExistAndDecreaseAppropriateDose(int inputPin, string fileVaccineName ) 
 {
 
     int checkFlagFoundPin = 0;
 
-    ifstream checkin;
-    checkin.open( "vaccine_detail.txt", ios::in | ios::binary );
+    fstream checkin;
+    checkin.open( "vaccine_detail.txt", ios::in | ios::out | ios::ate | ios::binary );
 
     if( !checkin )
    {
@@ -184,7 +185,7 @@ int checkPincodeExist(int inputPin)//rewrite since pincode search not used in th
    }
    else
    {
- 
+       checkin.seekg(0);
        checkin.read(( char* )this, sizeof( *this ) );
  
        while( !checkin.eof() )
@@ -194,10 +195,49 @@ int checkPincodeExist(int inputPin)//rewrite since pincode search not used in th
            if( pincode == inputPin )       
  
            {
+               if( fileVaccineName == "Covishield" )
+               {
+                    if( covishieldDosesTotal > 0 )
+                    {
+                        covishieldDosesTotal -= 1;
+
+                        checkin.seekp(checkin.tellp() - sizeof( *this ));
+                        checkin.write(( char* )this, sizeof( *this ));
+
+                        checkin.close();
+                        return 1;
+                    }
+                    else
+                    {
+                        checkin.close();
+                        return 0;
+                    }
+
+
+               }
+               else
+               if( fileVaccineName == "Cowin" ) //else condition needed?
+               {
+                   if( cowinDosesTotal > 0 )
+                    {
+                        cowinDosesTotal -= 1;
+
+                        checkin.seekp(checkin.tellp() - sizeof( *this ));
+                        checkin.write(( char* )this, sizeof( *this ));
+
+                        checkin.close();
+                        return 1;
+                    }
+                    else
+                    {
+                        checkin.close();
+                        return 0;
+                    }
+               }
  
-               checkFlagFoundPin = 1;
+               checkFlagFoundPin = 1;//not needed?
  
-               break;
+               break;//not needed?
  
            }
  
@@ -218,7 +258,7 @@ int checkPincodeExist(int inputPin)//rewrite since pincode search not used in th
     }
     else
     {
-        return 1;       //found return 1
+        return 1;       //not needed?
     }
 
 } 
@@ -448,7 +488,7 @@ person()
  
  void showPersonDetails()//rearrange order of display?
 {
-   cout << "Name: " << personName << ":-\n";
+   cout << "\nName: " << personName;
    cout << "\nMobile: " << mobileNumber;
    cout << "\nVaccine name: " << vaccineName;
 
@@ -472,6 +512,8 @@ person()
 
  void showVaccinationStatus()
  {
+    cin.clear();//testing if mobile error goes away
+    cin.ignore( 1000, '\n' );
 
     long inputMobileNumber;
 
@@ -481,7 +523,7 @@ person()
     cin>> inputMobileNumber;
 
     ifstream in;
-    in.open( "patient_detail.txt", ios::in | ios::binary );
+    in.open( "person_detail.txt", ios::in | ios::binary );
 
     if( !in )
     {
@@ -527,14 +569,23 @@ void registerForVaccine()
  
 
     int inputPincode;
-    int inputDoseNumber;
-    int inputMobileNumber;
+    int inputDoseNumber = 0 ;
+    long inputMobileNumber;
     string inputName;
 
+    date inputDate;
+
     vaccine Vtemp;//change name
+
+    int flagMobileFound = 0;
+    int flagSameName = 0;
+
+    int datesDifferenceInDays;
  
     cout << "\nEnter pincode: ";
     cin >> inputPincode;
+
+    
 
     cout << "\nEnter mobile number: "; //check mobile no exist then name same then if dose2 appropriate vaccine dose available (not zero) at same pincode 
     cin >> inputMobileNumber;
@@ -551,24 +602,197 @@ void registerForVaccine()
         cin >> inputDoseNumber;
 
         if( inputDoseNumber < 1 || inputDoseNumber > 2 )
-        cout<<"Invalid dose number!";
+        cout << "Invalid dose number!";
         else
         break;
 
     }
 
 
-    if( Vtemp.checkPincodeExist( inputPincode ) ) //will check for pincode again later to update if optimise either store or write expaned code here instead of fn 
+    fstream personFile;
+    personFile.open( "person_detail.txt", ios::in | ios::out | ios::ate | ios::binary );
+
+    if( !personFile )
     {
+        cout << "\nFile not found!\n";
+    }
+    else    //possibly change to more refined form with functions
+    {
+        personFile.seekg(0);
+        personFile.read( (char*)this, sizeof(*this) );
+
+        while( !personFile.eof() )
+        {
+            if( mobileNumber == inputMobileNumber )
+            {
+                if( personName == inputName )
+                {
+                    switch ( inputDoseNumber )
+                    {
+                    case 1 : cout << "\nAlready registered for Dose 1 " << vaccineName << " !\n"; //not checking since only possible scenario in our logic
+                        break;
+
+                    case 2 :    if( dose2==true )//not checking other since dose1 must be true
+                                {
+                                    cout << "\nAlready registered for Dose 2 " << vaccineName << " !\n";
+                                }
+                                else
+                                {
+                                    cout << "Enter date for dose 2 vaccination:-\n";
+                                    inputDate.enterDate();
+
+                                    datesDifferenceInDays = dateDose1.getDatesDifference( inputDate ); 
+
+                                    if( ( datesDifferenceInDays < 60 ) && ( datesDifferenceInDays >= 0 ) )
+                                    {
+                                        cout << "\nWait for " << 60 - datesDifferenceInDays << " more days before registering!\n";
+                                    }
+                                    else
+                                    if( datesDifferenceInDays < 0 )
+                                    {
+                                        cout << "\nInvalid date!\n";//put in loop till dates diff positive? but 60 days check tells to 'wait'
+                                    }
+                                    else
+                                    {
+
+                                        if( Vtemp.checkPincodeExistAndDecreaseAppropriateDose( inputPincode, vaccineName ) )
+                                        {
+                                            cout << "\nVaccine dose decremented!\n";//debug
+
+                                            dose2 = true;
+
+                                            dateDose2 = inputDate;
+
+                                            personFile.seekp( personFile.tellp() - sizeof(*this) );
+                                            personFile.write( (char*)this, sizeof(*this) );
+                                            
+
+                                        }
+                                        else
+                                        {
+                                            cout << "\nNo vaccines available at this pincode!\n";//could be none added or all depleted
+                                        }
 
 
+
+                                    }
+
+                                }
+
+                        break;
+                    
+                    default: cout << "\nCode shouldn't reach here!\n";
+                        break;
+                    }
+
+            
+                }
+                else
+                {
+                    cout << "\nThis mobile number is already registered to another user!";
+                    flagSameName = 0;
+                }
+
+                flagMobileFound = 1;
+
+                break;
+            }
+
+            personFile.read( (char*)this, sizeof(*this) );
+
+        }
+
+        if( !flagMobileFound ) //possibly change to more refined form with functions
+       {
+           
+
+           fstream pfile;
+
+           //add open file code   <--
+ 
+           cout<< "\nNew mobile number!\n";//debug
+
+            switch ( inputDoseNumber )
+                    {
+                    case 2 : cout << "\nMust register for dose 1 first!\n";
+                        break;
+
+                    case 1 :    if( dose2==true )//not checking other since dose1 must be true
+                                {
+                                    cout << "\nAlready registered for Dose 2 " << vaccineName << " !\n";
+                                }
+                                else
+                                {
+                                    cout << "Enter date for dose 1 vaccination:-\n";
+                                    inputDate.enterDate();
+
+
+
+                                    if( Vtemp.checkPincodeExistAndDecreaseAppropriateDose( inputPincode, "Covishield" ) )
+                                    {
+                                        cout << "\nVaccine dose decremented!\n";//debug
+
+                                        dose1 = true;
+
+                                        dose2 = false; //just in case initialising, remove and check later
+
+                                        dateDose1 = inputDate;
+
+                                        dateDose2 = inputDate; //just in case initialising, remove and check later
+
+                                        vaccineName = "Covishield";
+
+                                        mobileNumber = inputMobileNumber;
+
+                                        personName = inputName;
+
+                                        pfile.open("person_detail.txt", ios::out | ios::app | ios::binary);
+                                        pfile.write(( char* )this, sizeof( *this ));
+                                        pfile.close();
+                                        
+                                        cout<<"core dump?";
+
+                                    }
+                                    else
+                                    if( Vtemp.checkPincodeExistAndDecreaseAppropriateDose( inputPincode, "Cowin" ) )
+                                    {
+                                        cout << "\nVaccine dose decremented!\n";//debug
+
+                                        dose1 = true;
+
+                                        dateDose1 = inputDate;
+
+                                        vaccineName = "Cowin";
+
+                                        pfile.open("person_detail.txt", ios::out | ios::app | ios::binary);
+                                        pfile.write(( char* )this, sizeof( *this ));
+                                        pfile.close();
+
+                                    }
+                                    else
+                                    {
+                                        cout << "\nNo vaccines available at this pincode!\n";//could be none added or all depleted
+                                    }
+
+
+
+                                    
+
+                                }
+
+                        break;
+                    
+                    default : cout << "\nCode shouldn't reach here!\n";
+                        break;
+                    }
+ 
+        }
 
 
     }
-    else
-    {
-        cout<<"No vaccines available at this pincode!";
-    }
+
+    personFile.close();
+
 
 
 
@@ -607,9 +831,13 @@ void registerForVaccine()
 void menu()
 {
 
-    fstream fout;
-    fout.open("vaccine_detail.txt", ios::app | ios::binary );
-    fout.close();
+    fstream fout1;
+    fout1.open("vaccine_detail.txt", ios::app | ios::binary );
+    fout1.close();
+
+    fstream fout2;
+    fout2.open("person_detail.txt", ios::app | ios::binary );
+    fout2.close();
 
    int option, flag = 1;
 
@@ -636,12 +864,12 @@ void menu()
                    Vinput.addVaccine();
                    break;
  
-       case 2 :  
-                  
+       case 2 :    
+                   Pinput.registerForVaccine();  
                    break;
  
        case 3 :
-
+                   Pinput.showVaccinationStatus();
                    break;
  
        case 4 :
