@@ -12,6 +12,11 @@ struct date
  
  
    //start enter date fn
+
+   void showDate()
+   {
+       cout<<day<<"/"<<month<<"/"<<year;
+   }
  
    void enterDate()
    {
@@ -154,6 +159,71 @@ void clearVaccineObject()
    covishieldDosesTotal = 0;
 }
  
+void showVaccineDetails()
+{
+   cout<< "Doses available at pincode "<< pincode<< ":-\n";
+   cout<< "Covishield: "<<covishieldDosesTotal;
+   cout<< "\nCowin: "<<cowinDosesTotal;
+   cout<<"\n";
+}
+
+
+int checkPincodeExist(int inputPin)//rewrite since pincode search not used in this manner  
+{
+
+    int checkFlagFoundPin = 0;
+
+    ifstream checkin;
+    checkin.open( "vaccine_detail.txt", ios::in | ios::binary );
+
+    if( !checkin )
+   {
+ 
+       cout<< "\nFile not found!\n";
+ 
+   }
+   else
+   {
+ 
+       checkin.read(( char* )this, sizeof( *this ) );
+ 
+       while( !checkin.eof() )
+ 
+       {
+ 
+           if( pincode == inputPin )       
+ 
+           {
+ 
+               checkFlagFoundPin = 1;
+ 
+               break;
+ 
+           }
+ 
+           checkin.read(( char* )this, sizeof( *this ) );
+ 
+       }
+  
+ 
+   }
+ 
+ 
+   checkin.close();
+
+
+    if( !checkFlagFoundPin ) 
+    {
+        return 0;       //not found return 0
+    }
+    else
+    {
+        return 1;       //found return 1
+    }
+
+} 
+
+
 void addVaccine()
 {
  
@@ -282,16 +352,7 @@ void addVaccine()
   
 }
  
- 
- 
-void showVaccineDetails()
-{
-   cout<< "Doses available at pincode "<< pincode<< ":-\n";
-   cout<< "Covishield: "<<covishieldDosesTotal;
-   cout<< "\nCowin: "<<cowinDosesTotal;
-   cout<<"\n";
-}
- 
+
  
 void searchForAvailablilty()
  
@@ -369,6 +430,8 @@ void searchForAvailablilty()
 class person
 {
  
+public:
+
 long mobileNumber;
 string personName;
 bool dose1;
@@ -376,95 +439,148 @@ bool dose2;
 date dateDose1;
 date dateDose2;
 string vaccineName;
- 
- 
- 
- 
-/* void registerForVaccine()
+
+person()
 {
- 
- 
- 
-string pincode;
- 
-int flagFoundPin = 0;
- 
-cout<< "\nEnter pincode of vaccine to update(enter mobile no): ";
-getline( cin, pincode );                               //maybe instead of all this make function(pincode)
-                                                   //that searches for pincode and returns 1 if found for code reuse in other fns
- 
-fstream fchange;
- 
-fchange.open( "vaccine_detail.txt", ios::in | ios::binary );
- 
-if( !fchange )
-{
-cout<< "\nError file not found!\n";
+    dose1 = false;
+    dose2 = false;
 }
-else
+ 
+ void showPersonDetails()//rearrange order of display?
 {
-       Student student;
- 
-       fchange>>student;
- 
-       while( !fchange.eof() )
+   cout << "Name: " << personName << ":-\n";
+   cout << "\nMobile: " << mobileNumber;
+   cout << "\nVaccine name: " << vaccineName;
+
+   if( dose1 == true && dose2 == false )
+   {
+        cout << "\nDose 1 date: "; 
+        dateDose1.showDate();
+        cout << "\n";
+
+   }
+   else
+   if( dose1 == true && dose2 == true )
+   {
+        cout << "\nDose 2 date: "; 
+        dateDose2.showDate();
+        cout << "\n";
+   }
+
+}
+
+
+ void showVaccinationStatus()
+ {
+
+    long inputMobileNumber;
+
+    int flagFoundPin = 0;
+
+    cout<< "Enter mobile number: ";
+    cin>> inputMobileNumber;
+
+    ifstream in;
+    in.open( "patient_detail.txt", ios::in | ios::binary );
+
+    if( !in )
+    {
+        cout<<"\nFile not found!\n";
+    }
+    else
+    {
+        in.read( (char*)this, sizeof(*this) );
+
+        while( !in.eof() )
+        {
+            if( mobileNumber == inputMobileNumber )
+            {
+                showPersonDetails();
+
+                flagFoundPin = 1;
+
+                break;
+            }
+
+            in.read( (char*)this, sizeof(*this) );
+
+        }
+
+        if( !flagFoundPin )
        {
-           if( student.mPhoneNumber == pincode )       //or check student.mPhonemunber==pincode here itself and exit and display according to flag
-           {                                   
-               flagFoundPin = 1;
  
-               if( xtemp == 0 )   //in reg fn check both totals
-               {
-                   cout<< "\nAll vaccines depleted at this pincode!//mid is 0\n";
-               }        
-               else
-               if( xtemp > 0 )
-               {
-                   int position;
+           cout<< "\nNo person registered with this mobile number!\n";
  
-                   cout<< endl<< xtemp<< " Vaccine available and booked!"; // in reg fn display "respective" vaccine is avaialble and set person vaccine name accordingly
- 
-                   fchange.close();//
- 
-                   fstream fchange;//
- 
-                   fchange.open("students.txt",ios::ate|ios::binary);//
- 
-                   position = fchange.tellp();
- 
-                   fchange.seekp( sizeof(Student), ios::beg );//
- 
-                   fchange<<student;//
-                  
- 
-                   cout<< "\nVaccine count updated to "<< xtemp<< endl;
- 
- 
-               }
- 
- 
- 
-               break;
- 
- 
-           }
- 
-           fchange>>student; //load next object
        }
+
+
+    }
+
+    in.close();
+
+ }
+
+
  
-       if( !flagFoundPin )
-       {
-           cout<< "No Pincode found(pgm meaning) (or No vaccines available at this pincode! for actual project)\n";
-       } 
+void registerForVaccine()
+{
+ 
+
+    int inputPincode;
+    int inputDoseNumber;
+    int inputMobileNumber;
+    string inputName;
+
+    vaccine Vtemp;//change name
+ 
+    cout << "\nEnter pincode: ";
+    cin >> inputPincode;
+
+    cout << "\nEnter mobile number: "; //check mobile no exist then name same then if dose2 appropriate vaccine dose available (not zero) at same pincode 
+    cin >> inputMobileNumber;
+
+    cin.clear();
+    cin.ignore( 1000, '\n' );
+
+    cout << "\nEnter Name: ";//should check case insensitive?
+    getline( cin, inputName );
+
+    while( inputDoseNumber == 0 )
+    {
+        cout << "\nEnter dose number ( 1 or 2 ) : ";
+        cin >> inputDoseNumber;
+
+        if( inputDoseNumber < 1 || inputDoseNumber > 2 )
+        cout<<"Invalid dose number!";
+        else
+        break;
+
+    }
+
+
+    if( Vtemp.checkPincodeExist( inputPincode ) ) //will check for pincode again later to update if optimise either store or write expaned code here instead of fn 
+    {
+
+
+
+
+    }
+    else
+    {
+        cout<<"No vaccines available at this pincode!";
+    }
+
+
+
+                                            
  
  
+     
  
-       fchange.close();
+    
+ 
  
 }
- 
- 
-} */
  
  
  
@@ -480,13 +596,9 @@ else
  
  
  
-//global fn
  
  
- 
- 
- 
- 
+
  
  
  
@@ -500,7 +612,10 @@ void menu()
     fout.close();
 
    int option, flag = 1;
+
    vaccine Vinput;
+
+   person Pinput;
  
    while( flag == 1 )
    {
@@ -526,6 +641,7 @@ void menu()
                    break;
  
        case 3 :
+
                    break;
  
        case 4 :
