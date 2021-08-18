@@ -25,7 +25,7 @@
             cin >> pincode;
             cout << "Number of new Cowin vaccine : ";
             cin >> cowinDosesTotal;
-            cout << "Number of new Covishiled vaccine : ";
+            cout << "Number of new Covishield vaccine : ";
             cin >> covishieldDosesTotal;
             total_vaccine_number = cowinDosesTotal + covishieldDosesTotal;
         }
