@@ -39,29 +39,17 @@ void printloadanim()
 {
     for(int i=2;i<100;i++)//length
     {
-        //cout<<"***";
         for(int j=2;j<14;j++)//height
-        {
-            //cout<<"\033[31m*\033[0m" << std::flush;
+        {    
             cout<<"\033["<<j<<";"<<i<<"f";
             cout<<"*"; 
             
-            //nanosleep(&tim , &tim2);
         }
         
         usleep(1000);
-        // cout<<"\033[10A";
-        // getch();
-        // cout<<"\033[1C";
-        // getch();
-
-
-
     }
 
     cout << "\x1B[2J\x1B[H";//clrscr
-
-
 }
 
 
@@ -69,7 +57,6 @@ void printlowerbox()
 {
     cout << "|                                                                                            |" << endl;
     cout << "|____________________________________________________________________________________________|" << endl;
-
 }
 
 
@@ -80,52 +67,54 @@ void addVaccine( vector<Vaccine> &vaccinefile )
    int flagFoundPin = 0, vaccineType=0, vaccineNameFlag=0, inputCovishieldDoses=0, inputCowinDoses = 0;
  
 
-
     cout << "\x1B[2J\x1B[H";//clrscr
     cout << "_____________________________________________________________________________________________" << endl;
     cout << "|                                                                                            |" << endl;
     cout << "|                                  \033[1m\033[34mVACCINATION PORTAL\033[0m                                        |" << endl;
     cout << "|                                   \"\033[31mAdding Vaccine\033[0m\"                                         |" << endl;
     cout << "|                                                                                            |" << endl;
-    // cout << "\033[s|____________________________________________________________________________________________|" << endl;
+    // cout << "\033[s|____________________________________________________________________________________________|" << endl;//not being print
+
+    // cout<<"\033[u";//was for commented cursor save above
 
 
-    // cout<<"\033[u";
-
-
-    cout << "|                     Enter pincode:\033[s                                                         |" << endl;
+    cout << "|                     Enter pincode: \033[s                                                        |" << endl;
     printlowerbox();
-    cout<<"\033[u";
-   cin>> inputPincode;
 
-   printlowerbox();
+    cout<<"\033[u";
+    cin>> inputPincode;
+    //printlowerbox();
  
    while( vaccineNameFlag == 0 )
    {
-       cout<< "Choose vaccine name:-\n"; //at a time enter only one type?
-       cout<< "1.Covishield\n";
-       cout<< "2.Cowin\n";
-       cout<< "3.Both\n";
-       cout<< "Enter option: ";
-       cin>> vaccineType;
+
+       cout << "|                     Choose vaccine name:-                                                  |" << endl;
+       cout << "|                     1.Covishield                                                           |" << endl;
+       cout << "|                     2.Cowin                                                                |" << endl;
+       cout << "|                     3.Both                                                                 |" << endl;
+       cout << "|                     Enter option: \033[s                                                         |" << endl;
+       printlowerbox();
+
+        cout<<"\033[u";
+        cin>> vaccineType;
  
        switch ( vaccineType )
        {
-       case 1 :    //maybe use while loop to check for negative input
+       case 1 :    
                    cout<< "Enter covishield doses: ";
-                   cin>> inputCovishieldDoses; //inputCowinDoses already inintialised 0
+                   cin>> inputCovishieldDoses;
  
                    vaccineNameFlag=1;
            break;
  
-       case 2 :    //maybe use while loop to check for negative input
+       case 2 :    
                    cout<< "Enter cowin doses: ";
-                   cin>> inputCowinDoses; //inputCovishieldDoses already inintialised 0
+                   cin>> inputCowinDoses; 
  
                    vaccineNameFlag=1;
            break;
  
-       case 3 :    //maybe use while loop to check for negative input
+       case 3 :    
                    cout<< "Enter covishield doses: ";
                    cin>> inputCovishieldDoses;
                    cout<< "Enter cowin doses: ";
