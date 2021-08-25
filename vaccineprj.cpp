@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <unistd.h>
+#include <termios.h>
 #include "Vaccine.h"
 #include "Person.h"
 
@@ -9,6 +11,66 @@
  
 using namespace std;
 
+//getch fn from net
+char getch(void)
+{
+    char buf = 0;
+    struct termios old = {0};
+    fflush(stdout);
+    if(tcgetattr(0, &old) < 0)
+        perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if(tcsetattr(0, TCSANOW, &old) < 0)
+        perror("tcsetattr ICANON");
+    if(read(0, &buf, 1) < 0)
+        perror("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if(tcsetattr(0, TCSADRAIN, &old) < 0)
+        perror("tcsetattr ~ICANON");
+    //printf("%c\n", buf);  //include for display input immediately
+    return buf;
+}
+
+void printloadanim()
+{
+    for(int i=2;i<100;i++)//length
+    {
+        //cout<<"***";
+        for(int j=2;j<14;j++)//height
+        {
+            //cout<<"\033[31m*\033[0m" << std::flush;
+            cout<<"\033["<<j<<";"<<i<<"f";
+            cout<<"*"; 
+            
+            //nanosleep(&tim , &tim2);
+        }
+        
+        usleep(1000);
+        // cout<<"\033[10A";
+        // getch();
+        // cout<<"\033[1C";
+        // getch();
+
+
+
+    }
+
+    cout << "\x1B[2J\x1B[H";//clrscr
+
+
+}
+
+
+void printlowerbox()
+{
+    cout << "|                                                                                            |" << endl;
+    cout << "|____________________________________________________________________________________________|" << endl;
+
+}
 
 
 void addVaccine( vector<Vaccine> &vaccinefile )
@@ -17,8 +79,26 @@ void addVaccine( vector<Vaccine> &vaccinefile )
  
    int flagFoundPin = 0, vaccineType=0, vaccineNameFlag=0, inputCovishieldDoses=0, inputCowinDoses = 0;
  
-   cout<< "\nEnter pincode: ";
+
+
+    cout << "\x1B[2J\x1B[H";//clrscr
+    cout << "_____________________________________________________________________________________________" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                  \033[1m\033[34mVACCINATION PORTAL\033[0m                                        |" << endl;
+    cout << "|                                   \"\033[31mAdding Vaccine\033[0m\"                                         |" << endl;
+    cout << "|                                                                                            |" << endl;
+    // cout << "\033[s|____________________________________________________________________________________________|" << endl;
+
+
+    // cout<<"\033[u";
+
+
+    cout << "|                     Enter pincode:\033[s                                                         |" << endl;
+    printlowerbox();
+    cout<<"\033[u";
    cin>> inputPincode;
+
+   printlowerbox();
  
    while( vaccineNameFlag == 0 )
    {
@@ -601,8 +681,21 @@ void exit( vector<Vaccine> &vaccinefile, vector<Person> &personfile )//add perso
 
 
 
-
-    cout<<"\nThank you for using the vaccination portal!\n\n";
+    cout << "\x1B[2J\x1B[H";//clrscr
+    cout << "_____________________________________________________________________________________________" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                        \033[32mThank you for using the vaccination portal!\033[0m                         |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|____________________________________________________________________________________________|" << endl<<endl;
     
 }
 
@@ -758,45 +851,81 @@ void showVaccinePortalMenu()
  
    while( flag == 1 )
    {
-       //Vinput.clearVaccineObject(); //needed?
+       cout << "\x1B[2J\x1B[H";//clrscr
 
-       cout<< "\n\nVaccination 32 Portal Menu:-";
-       cout<< "\n1.Add Vaccine";
-       cout<< "\n2.Register Vaccine";
-       cout<< "\n3.View Vaccination Status";
-       cout<< "\n4.Search Vaccine availability";
-       cout<< "\n5.Exit";
-       cout<< "\nEnter options: ";
+
+
+
+
+
+
+
+
+
+
+
+    cout << "_____________________________________________________________________________________________" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                  \033[1m\033[34mVACCINATION PORTAL\033[0m                                        |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                  \033[36m1. Add Vaccine\033[0m                                            |" << endl; 
+    cout << "|                                  \033[36m2. Register Vaccine\033[0m                                       |" << endl;
+    cout << "|                                  \033[36m3. View Vaccination Status\033[0m                                |" << endl;
+    cout << "|                                  \033[36m4. Search Vaccine Availability\033[0m                            |" << endl;
+    cout << "|                                  \033[36m5. Exit\033[0m                                                   |" << endl;
+    cout << "|                                                                                            |" << endl;
+    cout << "|                                  \033[35mEnter option:\033[0m \033[s                                            |" << endl;
+    cout << "|____________________________________________________________________________________________|" << endl;
+    cout<<"\033[u";
+
+
+   
+
        cin>> option;
+
+
+        printloadanim();
+
+ 
  
        switch ( option )
        {
        case 1 :   
                    addVaccine( vaccinefile) ;
+                   cout<<"\nEnter any key to continue : ";
+                   getch();
                    break;
  
        case 2 :    
-                   registerForVaccine( vaccinefile, personfile );  
+                   registerForVaccine( vaccinefile, personfile );
+                   cout<<"\nEnter any key to continue : ";
+                   getch();  
                    break;
  
        case 3 :
                     showVaccinationStatus( personfile );
+                    cout<<"\nEnter any key to continue : ";
+                    getch();
                    break;
  
        case 4 :
                    searchForAvailablilty( vaccinefile );
+                   cout<<"\nEnter any key to continue : ";
+                   getch();
                    break;
  
-       case 5 :    flag=0;
-                    exit( vaccinefile , personfile);//add person later
-                   break;
+       case 5 :     flag=0;
+                    exit( vaccinefile , personfile);
+                    break;
   
        default :   cout<<"Invalid option!";
                    break;
  
        }
+
  
-   }
+    }
  
 }
  
