@@ -8,158 +8,8 @@
 //included classes .h files
  
 using namespace std;
- 
-struct Date2
-{
-
-   int day;
-   int month;
-   int year;
- 
- 
-   void showDate2()
-   {
-
-       cout<<day<<"/"<<month<<"/"<<year;
-       
-       
 
 
-   }
- 
-   void enterDate2()
-   {
-
-       int dateFlag = 0;
-                                                       //string inputDate;cin.clear();cin.ignore(100,'\n');
- 
-       while( dateFlag == 0 )
-       {
-          
-       //or use getline for string and then parse with .find and .substr and .erase?
-       cout<< "Enter day in dd format: ";
-       cin>> day;
-       cout<< "Enter month in mm format: ";
-       cin>> month;
-       cout<< "Enter year in yy format: ";
-       cin>> year;
- 
-       if( day > 31 || day < 18 )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( month > 12 || month < 8 )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( year < 2021 )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       {
-           dateFlag = 1;
-           cout<< "Date successfully entered!";
-       }
-                  
-          
-       }
- 
-
-
-   }
- 
-   int getDatesDifference2( Date2 date2 )
-   {
-
-
-       //fn finds difference in days date2 - date1(aka calling date) by: finding no of days from year 0000 for each date and subtracting them;
- 
-       int daysBeforeDate1=0;
-       int daysBeforeDate2=0;
- 
-       int leapYearsBeforeDate1;
-       int leapYearsBeforeDate2;
- 
-       const int monthDays[ 12 ] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
- 
-       int index;
- 
-   //finding date1 days:-
- 
-       //convert years and days and add to daycount
-       daysBeforeDate1 += ( year * 365 ) + day;
- 
-       //add leap year days to dayscount
-       if( month <= 2 )
-       {
-           leapYearsBeforeDate1 = ( (year - 1) / 4 ) - ( (year - 1) / 100 ) + ( (year - 1) / 400 );
-       }
-       else
-       {
-           leapYearsBeforeDate1 = ( year / 4 ) - ( year / 100 ) + ( year / 400 );
-       }
- 
-       daysBeforeDate1 += leapYearsBeforeDate1;
- 
-       //convert and add months to dayscount
-       for( index = 0 ; index < ( month - 1 ) ; index++ )
-       {
-           daysBeforeDate1 += monthDays[index];
-       }
- 
- 
-   //finding date2 days:-
- 
-       //convert years and days and add to daycount
-       daysBeforeDate2 += ( date2.year * 365 ) + date2.day;
- 
-       //add leap year days to dayscount.
-       if( date2.month <= 2 )
-       {
-           leapYearsBeforeDate2 = ( (date2.year - 1) / 4 ) - ( (date2.year - 1) / 100 ) + ( (date2.year - 1) / 400 );
-       }
-       else
-       {
-           leapYearsBeforeDate2 = ( date2.year / 4 ) - ( date2.year / 100 ) + ( date2.year / 400 );
-       }
- 
-       daysBeforeDate2 += leapYearsBeforeDate2;
- 
-       //convert and add months to dayscount
-       for( index = 0 ; index < ( date2.month - 1 ) ; index++ )
-       {
-           daysBeforeDate2 += monthDays[index];
-       }
- 
- 
-       //debug display days
-       cout<< "date1 days: "<< daysBeforeDate1;//
-       cout<< "date2 days: "<< daysBeforeDate2;//
- 
- 
-       //check 60 difference btw days
-       return (daysBeforeDate2 - daysBeforeDate1) ;
- 
-
-   }
- 
-};
-
-
-
-
-/* class pstore
-{
-
-     Vaccine V[10];//use dynamic memory alloc
-     //or use list instead of array
-     //
-
-
-}; */
 
 void addVaccine( vector<Vaccine> &vaccinefile )
 {
@@ -321,7 +171,7 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
 
     string inputName;
 
-    Date2 inputDate;
+    //Date2 inputDate;
 
     //Vaccine Vtemp;//change name
 
@@ -332,6 +182,8 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
  
     cout << "\nEnter pincode: ";
     cin >> inputPincode;
+
+    //cout<<"\npin:"<<inputPincode<<"\n";
 
     
 
@@ -390,19 +242,16 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
                                 }
                                 else
                                 {
-                                    struct Date2 inputDate;
-                                    struct Date2 fileDate;
+                                    //struct Date2 inputDate;
+                                    //struct Date2 fileDate;
 
                                     cout << "Enter date for dose 2 vaccination:-\n";
-                                    inputDate.enterDate2();
+                                    personObject.enterDate2();
 
-                                    fileDate.day = personObject.dateDose1.day;
-                                    fileDate.month = personObject.dateDose1.month;
-                                    fileDate.year = personObject.dateDose1.year;
 
                                     
 
-                                    datesDifferenceInDays = fileDate.getDatesDifference2( inputDate );
+                                    datesDifferenceInDays = personObject.getDatesDifference( personObject.dateDose1, personObject.dateDose2 );
 
 
                                     if( ( datesDifferenceInDays < 60 ) && ( datesDifferenceInDays >= 0 ) )
@@ -420,22 +269,20 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
 
 
 
-                                            for(int j = 0; i < vaccinefile.size(); i++ )
+                                            for(int j = 0; j < vaccinefile.size(); j++ )
                                             {
                                                 Vaccine vaccineObject;
                                                 vaccineObject = vaccinefile[j];
 
+                                                //cout<<"\nPin: "<<vaccineObject.pincode<<"\n";
             
                                                 if( vaccineObject.pincode == inputPincode )       
                                                 {
-                                                    if( vaccineObject.covishieldDosesTotal > 0 )
+                                                    if( personObject.vaccineName == "Covishield" && vaccineObject.covishieldDosesTotal > 0 )
                                                     {
                                                         vaccineObject.covishieldDosesTotal -= 1;
                                                         cout << "\nVaccine dose decremented!\n";//debug
                                                         personObject.dose2 = "true";
-                                                        personObject.dateDose2.day = inputDate.day;
-                                                        personObject.dateDose2.month = inputDate.month;
-                                                        personObject.dateDose2.year = inputDate.year;
 
                                                         vaccinefile[j] = vaccineObject;
                                                         personfile [i] = personObject;
@@ -443,14 +290,11 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
                                 
                                                     }
                                                     else
-                                                    if( vaccineObject.cowinDosesTotal >0)
+                                                    if( personObject.vaccineName == "Cowin" && vaccineObject.cowinDosesTotal >0)
                                                     {
                                                             vaccineObject.cowinDosesTotal -=1;
                                                             cout << "\nVaccine dose decremented!\n";//debug
                                                             personObject.dose2 = "true";
-                                                            personObject.dateDose2.day = inputDate.day;
-                                                            personObject.dateDose2.month = inputDate.month;
-                                                            personObject.dateDose2.year = inputDate.year;
 
                                                             vaccinefile[j] = vaccineObject;
                                                             personfile [i] = personObject;
@@ -472,7 +316,7 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
 
                                         if(!pinflag)
                                         {
-                                            cout << "\nNo vaccines available at this pincode!\n";//could be none added or all depleted
+                                            cout << "\nNo vaccines available at this pincode!(abc)\n";//could be none added or all depleted
                                         }
 
 
@@ -539,7 +383,7 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
                         case 1 :
                                 {
                                     cout << "Enter date for dose 1 vaccination:-\n";
-                                inputDate.enterDate2();                    
+                                personObject.enterDate1();                    
 
                                 int pinflag1=0;
 
@@ -560,10 +404,6 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
                                                         personObject.dose1 = "true";
                                                         personObject.dose2 = "false";
 
-                                                        personObject.dateDose1.day = inputDate.day;
-                                                        personObject.dateDose1.month = inputDate.month;
-                                                        personObject.dateDose1.year = inputDate.year;
-
                                                         personObject.vaccineName = "Covishield";
 
                                                         personObject.mobileNumber = inputMobileNumber;
@@ -582,10 +422,6 @@ void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfil
                                                         cout << "\nVaccine dose decremented!\n";//debug
                                                         personObject.dose1 = "true";
                                                         personObject.dose2 = "false";
-
-                                                        personObject.dateDose1.day = inputDate.day;
-                                                        personObject.dateDose1.month = inputDate.month;
-                                                        personObject.dateDose1.year = inputDate.year;
 
                                                         personObject.vaccineName = "Cowin";
 
@@ -658,26 +494,18 @@ void showVaccinationStatus( vector<Person> &personfile )
 
             cout << "\nName : " << personObject.personName;
             cout << "\nMobile number : " << personObject.mobileNumber;
+            cout << "\nVaccine : " <<personObject.vaccineName;
             if(personObject.dose1 == "true" && personObject.dose2 == "false" )
             {
                cout << "\nDose 1 date: "; 
-
-               Date2 tempd;
-               tempd.day = personObject.dateDose1.day;
-               tempd.month = personObject.dateDose1.month;
-               tempd.year = personObject.dateDose1.year;
-
-        	    tempd.showDate2();
+                cout<<personObject.dateDose1;
 
         	cout << "\n";
             }
             else if (personObject.dose1 == "true" && personObject.dose2 == "true")
             {
                 cout << "\nDose 2 date: "; 
-
-        	    cout<<personObject.dateDose2.day;
-               cout<<"/"<<personObject.dateDose2.month;
-               cout<<"/"<<personObject.dateDose2.year;
+                cout<<personObject.dateDose2;
 
         	cout << "\n";
             }
@@ -756,12 +584,8 @@ void exit( vector<Vaccine> &vaccinefile, vector<Person> &personfile )//add perso
             fout3<<personObject.personName<<"\n";
             fout3<<personObject.dose1<<"\n";
             fout3<<personObject.dose2<<"\n";
-            fout3<<to_string(personObject.dateDose1.day)<<"\n";
-            fout3<<to_string(personObject.dateDose1.month)<<"\n";
-            fout3<<to_string(personObject.dateDose1.year)<<"\n";
-            fout3<<to_string(personObject.dateDose2.day)<<"\n";
-            fout3<<to_string(personObject.dateDose2.month)<<"\n";
-            fout3<<to_string(personObject.dateDose2.year)<<"\n";
+            fout3<<personObject.dateDose1<<"\n";
+            fout3<<personObject.dateDose2<<"\n";
             fout3<<personObject.vaccineName<<"\n";
             fout3<<"."<<"\n";
         }
@@ -897,13 +721,9 @@ void showVaccinePortalMenu()
                     Pinput.personName = personObject[1];
                     Pinput.dose1 = personObject[2]; //IMPORTANT : if bool not work might have to use string instead(changed)
                     Pinput.dose2 = personObject[3];
-                    Pinput.dateDose1.day = stoi( personObject[4]);//maybe just change date to string and do parsing and handling locally(18/8/2021)
-                    Pinput.dateDose1.month = stoi( personObject[5]);
-                    Pinput.dateDose1.year = stoi( personObject[6]);
-                    Pinput.dateDose2.day = stoi( personObject[7]);
-                    Pinput.dateDose2.month = stoi( personObject[8]);
-                    Pinput.dateDose2.year = stoi( personObject[9]);
-                    Pinput.vaccineName = personObject[10];
+                    Pinput.dateDose1=personObject[4];
+                    Pinput.dateDose2=personObject[5];
+                    Pinput.vaccineName = personObject[6];
 
                     personfile.push_back(Pinput);
 
@@ -940,14 +760,12 @@ void showVaccinePortalMenu()
    {
        //Vinput.clearVaccineObject(); //needed?
 
-       cout<< "\n\nVaccination Portal Menu:-";
+       cout<< "\n\nVaccination 32 Portal Menu:-";
        cout<< "\n1.Add Vaccine";
        cout<< "\n2.Register Vaccine";
        cout<< "\n3.View Vaccination Status";
        cout<< "\n4.Search Vaccine availability";
        cout<< "\n5.Exit";
-       cout<< "\n6.all person";
-       cout<< "\n7.all vaccine";
        cout<< "\nEnter options: ";
        cin>> option;
  
@@ -972,14 +790,6 @@ void showVaccinePortalMenu()
        case 5 :    flag=0;
                     exit( vaccinefile , personfile);//add person later
                    break;
-
-        case 6 :    
-                    //showallp( personfile );//debug
-                   break;
-
-        case 7 :    
-                    //showallv( vaccinefile );//debug
-                   break;
   
        default :   cout<<"Invalid option!";
                    break;
@@ -992,7 +802,6 @@ void showVaccinePortalMenu()
  
 int main()
 {
-    cout<<"vector!";
     showVaccinePortalMenu();
 }
  
