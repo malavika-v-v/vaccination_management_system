@@ -1,10 +1,9 @@
-
 using namespace std;
 #include <string>
+#include <vector>
+#include "Vaccine.h"
 
-class Person
-{
-//change to private later and add fns for retrieving and changing private data?
+class Person{
 public:
 
 long mobileNumber;
@@ -21,11 +20,8 @@ Person()
     dose2 = "false";
 }
 
-void enterDate1();
+void showVaccinationStatus( vector<Person> &personfile );
 
-void enterDate2();
-
-int getDatesDifference(string date1, string date2);
- 
+void registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfile); 
 };
  
