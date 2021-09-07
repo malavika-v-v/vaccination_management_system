@@ -3,216 +3,279 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <unistd.h>
+#include <termios.h>
 #include "Person.h"
-#include "Vaccine.h"
+#include "Date.h"
 
-//using namespace std; //dont use, bad practise?
-
-
-void Person::enterDate1()
+void Person::showVaccinationStatus( vector<Person> &personfile )
 {
+    long inputMobileNumber;
+    int flagFoundNumber = 0;
 
-       int dateFlag = 0;
-       int day, month, year;
-                                                       //string inputDate;cin.clear();cin.ignore(100,'\n');
- 
-       while( dateFlag == 0 )
-       {
-          
-       //or use getline for string and then parse with .find and .substr and .erase?
-       cout<< "Enter day in dd format: ";
-       cin>> day;
-       cout<< "Enter month in mm format: ";
-       cin>> month;
-       cout<< "Enter year in yy format: ";
-       cin>> year;
- 
-       if( year < 2021 )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( day < 1 || day > 31)
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( month < 1 || month > 12)
-       {
-           cout<< "Invalid date!";
-       }
-       else//day > 31 redundant //not checking leap yr
-       if( (month == 1 && day > 31) || (month == 2 && day > 28) || (month == 3 && day > 31) || (month == 4 && day > 30) || (month == 5 && day > 31) || (month == 6 && day > 30) || (month == 7 && day > 31) || (month == 8 && day > 31) || (month == 9 && day > 30) || (month == 10 && day > 31) || (month == 11 && day > 30) || (month == 12 && day > 31) )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       {
-           dateFlag = 1;
-           cout<< "Date successfully entered!";
-       }
-                           
-       }
+    cout << "VACCINATION STATUS:-\n";
+    cout << "\nEnter mobile number: ";
+    cin >> inputMobileNumber;  
 
-       dateDose1 = to_string(day) + "/" + to_string(month) + "/" + to_string(year);
-
-}
-
-void Person::enterDate2()
-{
-
-       int dateFlag = 0;
-       int day, month, year;
-                                                       //string inputDate;cin.clear();cin.ignore(100,'\n');
- 
-       while( dateFlag == 0 )
-       {
-          
-       //or use getline for string and then parse with .find and .substr and .erase?
-       cout<< "Enter day in dd format: ";
-       cin>> day;
-       cout<< "Enter month in mm format: ";
-       cin>> month;
-       cout<< "Enter year in yy format: ";
-       cin>> year;
- 
-       if( year < 2021 )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( day < 1 || day > 31)
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       if( month < 1 || month > 12)
-       {
-           cout<< "Invalid date!";
-       }
-       else//day > 31 redundant //not checking leap yr
-       if( (month == 1 && day > 31) || (month == 2 && day > 28) || (month == 3 && day > 31) || (month == 4 && day > 30) || (month == 5 && day > 31) || (month == 6 && day > 30) || (month == 7 && day > 31) || (month == 8 && day > 31) || (month == 9 && day > 30) || (month == 10 && day > 31) || (month == 11 && day > 30) || (month == 12 && day > 31) )
-       {
-           cout<< "Invalid date!";
-       }
-       else
-       {
-           dateFlag = 1;
-           cout<< "Date successfully entered!";
-       }
-                           
-       }
-
-       dateDose2 = to_string(day) + "/" + to_string(month) + "/" + to_string(year);
-
-}
-
-
-int Person::getDatesDifference(string date1, string date2)
-{
-    int day1,day2,month1,month2,year1,year2;
-      
-    // Vector of string to save tokens
-    vector <string> tokens;
-      
-    // stringstream class check1
-    stringstream check1(date1);
-      
-    string part;
-      
-    // Tokenizing w.r.t. space '/'
-    while(getline(check1, part, '/'))
+    for( int index = 0; index < personfile.size(); index++ )
     {
-        tokens.push_back(part);
+        Person personObject;
+        personObject = personfile[index];
+
+        if( personObject.mobileNumber == inputMobileNumber )      
+        {
+            cout << "\nName : " << personObject.personName;
+            cout << "\nMobile number : " << personObject.mobileNumber;
+            cout << "\nVaccine : " << personObject.vaccineName;
+            if( personObject.dose1 == "true" && personObject.dose2 == "false" )
+            {
+                cout << "\nDose 1 date: "; 
+                cout << personObject.dateDose1;
+        	    cout << "\n";
+            }
+            else if ( personObject.dose1 == "true" && personObject.dose2 == "true")
+            {
+                cout << "\nDose 2 date: "; 
+                cout << personObject.dateDose2;
+        	    cout << "\n";
+            }
+            else
+            {
+                cout << "Dose one not taken." << endl;
+            }
+            flagFoundNumber = 1;
+            break;
+        }
     }
-
-
-    day1    = stoi( tokens[0] );
-    month1  = stoi( tokens[1] );
-    year1   = stoi( tokens[2] );
-
-    stringstream check2(date2);
-
-    while(getline(check2, part, '/'))
+    if( !flagFoundNumber )
     {
-        tokens.push_back(part);
+    cout<< "\nNo person registered with this mobile number!\n";
     }
-
-    day2    = stoi( tokens[3] );
-    month2  = stoi( tokens[4] );
-    year2   = stoi( tokens[5] );
-
-
-
-    //fn finds difference in days date2 - date1(aka calling date) by: finding no of days from year 0000 for each date and subtracting them;
- 
-       int daysBeforeDate1=0;
-       int daysBeforeDate2=0;
- 
-       int leapYearsBeforeDate1;
-       int leapYearsBeforeDate2;
- 
-       const int monthDays[ 12 ] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
- 
-       int index;
- 
-   //finding date1 days:-
- 
-       //convert years and days and add to daycount
-       daysBeforeDate1 += ( year1 * 365 ) + day1;
- 
-       //add leap year days to dayscount
-       if( month1 <= 2 )
-       {
-           leapYearsBeforeDate1 = ( (year1 - 1) / 4 ) - ( (year1 - 1) / 100 ) + ( (year1 - 1) / 400 );
-       }
-       else
-       {
-           leapYearsBeforeDate1 = ( year1 / 4 ) - ( year1 / 100 ) + ( year1 / 400 );
-       }
- 
-       daysBeforeDate1 += leapYearsBeforeDate1;
- 
-       //convert and add months to dayscount
-       for( index = 0 ; index < ( month1 - 1 ) ; index++ )
-       {
-           daysBeforeDate1 += monthDays[index];
-       }
- 
- 
-   //finding date2 days:-
- 
-       //convert years and days and add to daycount
-       daysBeforeDate2 += ( year2 * 365 ) + day2;
- 
-       //add leap year days to dayscount
-       if( month2 <= 2 )
-       {
-           leapYearsBeforeDate2 = ( (year2 - 1) / 4 ) - ( (year2 - 1) / 100 ) + ( (year2 - 1) / 400 );
-       }
-       else
-       {
-           leapYearsBeforeDate2 = ( year2 / 4 ) - ( year2 / 100 ) + ( year2 / 400 );
-       }
- 
-       daysBeforeDate2 += leapYearsBeforeDate2;
- 
-       //convert and add months to dayscount
-       for( index = 0 ; index < ( month2 - 1 ) ; index++ )
-       {
-           daysBeforeDate2 += monthDays[index];
-       }
- 
- 
-       //debug display days
-       //cout<< "date1 days: "<< daysBeforeDate1;//
-       //cout<< "date2 days: "<< daysBeforeDate2;//
- 
- 
-       //check 60 difference btw days
-       return (daysBeforeDate2 - daysBeforeDate1) ;
-
-
 }
 
-//int main (void) { return 0; }
+void Person::registerForVaccine( vector<Vaccine> &vaccinefile, vector<Person> &personfile)
+{
+    int inputPincode;
+    int inputDoseNumber = 0 ;
+    int inputVaccine = 0;
+    long inputMobileNumber;
+    char dose2Choice;
+    string inputName;
+    int datesDifferenceInDays;
+    int flagPinFound=0, flagMobileFound = 0, flagpinfoundbutdepleted = 0, flagSameName = 0, flagmobilefounddose2done = 0, flagcontinuedose1 = 0;
+    int vaccineavailableandtype = 0;
+    int vindex = 0, pindex = 0;
+    
+    cout << "VACCINE REGISTRATION:-\n";
+    cout << "\nEnter pincode: ";
+    cin >> inputPincode;
+
+    for( vindex = 0; vindex < vaccinefile.size(); vindex++ )
+    {
+        Vaccine vobject;//can we declare at start of fn?
+        vobject = vaccinefile[vindex];
+
+        if( vobject.pincode == inputPincode )
+        {
+            flagPinFound = 1;
+            if( vobject.covishieldDosesTotal < 1 && vobject.cowinDosesTotal < 1 )
+            {
+                flagpinfoundbutdepleted = 1;
+                flagPinFound = 0;
+            }
+            break;//vindex current vaccinefile vector postion
+            //also breaking since pincode is unique
+        }
+    }
+    if( !flagPinFound )
+    {
+        if( flagpinfoundbutdepleted )
+        cout << "\nNo vaccines available at this pincode!(depleted)\n";
+        else
+        cout << "\nNo vaccines available at this pincode!(never added)\n";
+    }
+    else
+    {
+        cout << "\nEnter mobile number: ";
+        cin >> inputMobileNumber;
+
+        cin.clear();
+        cin.ignore( 1000, '\n' );
+
+        cout << "\nEnter Name: ";//Case sensitive
+        getline( cin, inputName );
+        for( pindex = 0; pindex < personfile.size(); pindex++ )
+        {
+            Person pobject;//can we declare at start of fn?
+            pobject = personfile[pindex];
+            if( pobject.mobileNumber == inputMobileNumber )
+            {
+                if( pobject.personName == inputName )
+                {
+                    flagSameName = 1;
+                }
+                if( pobject.dose2 == "true")
+                {
+                    flagmobilefounddose2done = 1;
+                }
+                flagMobileFound = 1;
+                break;//pindex current personfile vector postion
+                //also breaking since mobile number is unique
+            }
+        }
+        if( !flagMobileFound )
+        {
+            Person pobject2;
+            Vaccine vobject2;
+            Date dobject2;
+            vobject2 = vaccinefile[vindex];
+
+            while( inputVaccine != 4 )
+            {
+                cout << "\nNew User!\n";//new mobile number
+                cout << "Dose 1 Vaccine selection:-\n";
+                cout << "1.Covishield\n";
+                cout << "2.Cowin\n";
+                cout << "3.Quit registration\n";
+                cout << "Enter option: \n";
+                cin >> inputVaccine;
+
+                if( inputVaccine == 1 )
+                {
+                    if(vobject2.covishieldDosesTotal > 0)
+                    {
+                        vobject2.covishieldDosesTotal -= 1;
+                        pobject2.vaccineName = "Covishield";
+                        flagcontinuedose1 = 1;
+                        break;
+                    }
+                    else
+                    {
+                        cout << "\nNo Covishield vaccines available at this pincode!(depleted)\n";
+                    }
+                }
+                else
+                if( inputVaccine == 2 )
+                {
+                    if(vobject2.cowinDosesTotal > 0)
+                    {
+                        vobject2.cowinDosesTotal -= 1;
+                        pobject2.vaccineName = "Cowin";
+                        flagcontinuedose1 = 1;
+                        break;
+                    }
+                    else
+                    {
+                        cout << "\nNo Cowin vaccines available at this pincode!(depleted)\n";
+                    }
+                }
+                else
+                if( inputVaccine == 3 )
+                {
+                    flagcontinuedose1 = 0;
+                    cout << "\nExiting registration!\n";
+                    break;
+                }
+                else
+                {
+                    cout << "Invalid option!\n";
+                }
+            }
+            if(flagcontinuedose1)
+            {
+                cout << "\nEnter date for dose 1 vaccination:-\n";
+                pobject2.dateDose1 = dobject2.enterDate();
+                pobject2.dose1 = "true";
+                pobject2.dose2 = "false";
+                pobject2.mobileNumber = inputMobileNumber;
+                pobject2.personName = inputName;
+                vaccinefile[vindex] = vobject2;
+                personfile.push_back(pobject2);
+                cout << "\nVaccine Dose1 registration complete!\n";
+            }
+        }
+        else
+        {
+            if( !flagSameName )
+            {
+                cout << "\nThis mobile number is already registered to another user!\n";
+            }
+            else//mobile found
+            {
+                cout<<"\nPreviously registered User!\n";
+                if( flagmobilefounddose2done )
+                {
+                    cout << "\nAlready fully vaccinated!\n";
+                }
+                else
+                {
+                    Person pobject1;
+                    pobject1 = personfile[pindex];
+                    Vaccine vobject1;
+                    vobject1 = vaccinefile[vindex];
+                    Date dobject;
+
+                    if( pobject1.vaccineName == "Covishield" && vobject1.covishieldDosesTotal > 0 )
+                    {
+                        vaccineavailableandtype = 1;   
+                    }
+                    else
+                    if( pobject1.vaccineName == "Cowin" && vobject1.cowinDosesTotal > 0 )
+                    {
+                        vaccineavailableandtype = 2;
+                    }
+                    else
+                    {
+                        vaccineavailableandtype = 0;
+                    }
+                    if( vaccineavailableandtype == 0 )
+                    {
+                        cout << "\nSame vaccine as Dose 1 not available at this pincode!\n";
+                    }
+                    else
+                    {
+                        cout << "Dose 2 available!\n";
+                        cout << "Continue registration? (Yes = 'y' / No = Any other key)\n";
+                        cout << "Enter choice: ";
+                        cin >> dose2Choice;
+
+                        if(dose2Choice == 'y')
+                        {
+                            cout << "\nEnter date for dose 2 vaccination:-\n";
+                            pobject1.dateDose2 = dobject.enterDate();
+                            datesDifferenceInDays = dobject.getDatesDifference( pobject1.dateDose1, pobject1.dateDose2 );
+
+                            if( ( datesDifferenceInDays < 60 ) && ( datesDifferenceInDays >= 0 ) )
+                            {
+                                cout << "\nWait for " << 60 - datesDifferenceInDays << " more days before registering!\n";
+                            }
+                            else
+                            if( datesDifferenceInDays < 0 )
+                            {
+                                cout << "\nInvalid date!\n";
+                            }
+                            else
+                            {
+                                if( vaccineavailableandtype == 1 )
+                                vobject1.covishieldDosesTotal -= 1;
+                                else
+                                if( vaccineavailableandtype == 2 )
+                                vobject1.cowinDosesTotal -= 1;
+
+                                cout << "\nVaccine Dose2 registration complete!\n";
+                                pobject1.dose2 = "true";
+                                vaccinefile[vindex] = vobject1;
+                                personfile[pindex] = pobject1;
+                            }
+                        }
+                        else
+                        {
+                            cout << "\nExiting registration!\n";
+                        }
+                    }
+                }
+            }
+        }
+    } 
+}
+
