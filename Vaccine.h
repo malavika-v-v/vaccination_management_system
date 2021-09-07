@@ -1,9 +1,8 @@
 using namespace std;
 #include <string>
+#include <vector>
 
-class Vaccine
-{
-//change to private later and add fns for retrieving and changing private data?
+class Vaccine{
 public:
  
 int covishieldDosesTotal;
@@ -16,4 +15,7 @@ Vaccine()
    covishieldDosesTotal = 0;
 }
 
+void addVaccine( vector<Vaccine> &vaccinefile );
+
+void searchForAvailablilty( vector<Vaccine> &vaccinefile );
 };
